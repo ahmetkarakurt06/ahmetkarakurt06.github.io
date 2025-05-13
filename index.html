@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahmet Karakurt | Kişisel Blog</title>
+    <link href="style.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header img {
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        nav a {
+            color: white;
+            margin-left: 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        details {
+            background-color: #fff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        pre {
+            background: #eee;
+            padding: 10px;
+            overflow-x: auto;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="display: flex; align-items: center;">
+            <img src="logo.png" alt="Ahmet Karakurt Logo">
+            <h1>Ahmet Karakurt</h1>
+        </div>
+        <nav>
+            <a href="index.html">Ana Sayfa</a>
+            <a href="about.html">Hakkımda</a>
+            <a href="blog.html">Blog</a>
+            <a href="contact.html">İletişim</a>
+            <a href="downloads.html" class="button">İndirilebilir İçerikler</a>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Hoş Geldiniz!</h2>
+
+        <details>
+            <summary><strong>Küçük/Büyük Harf Kapatmak</strong></summary>
+            <pre>ALTER SYSTEM SET SEC_CASE_SENSITIVE_LOGON=FALSE;</pre>
+        </details>
+
+        <details>
+            <summary><strong>Küçük/Büyük Harf Açmak</strong></summary>
+            <pre>ALTER SYSTEM SET SEC_CASE_SENSITIVE_LOGON=TRUE;</pre>
+        </details>
+
+        <details>
+            <summary><strong>Meddata Login Kullanıcı Oluşturma</strong></summary>
+            <pre>
+-- login tablosuna bakarak kullanıcı oluşturma
+SELECT
+    'CREATE USER ' || loginame || ' IDENTIFIED BY ' || loginame || ';'
+FROM login;
+            </pre>
+        </details>
+
+        <details>
+            <summary><strong>Login tablosuna göre kullanıcıya yetki verme</strong></summary>
+            <pre>
+-- login tablosuna bakarak kullanıcıya yetki tanımlama
+SELECT
+    'GRANT doktor, idareci, connect, dba TO ' || loginame || ';'
+FROM login;
+            </pre>
+        </details>
+
+        <details>
+            <summary><strong>Oracle Database Open Cursors Değiştirme</strong></summary>
+            <pre>ALTER SYSTEM SET open_cursors = 1000 SCOPE=BOTH;</pre>
+        </details>
+
+        <details>
+            <summary><strong>Oracle 12G ORA-01031 Hatası (insufficient privileges)</strong></summary>
+            <pre>GRANT SELECT ON SYS.USER$ TO "HASTANE";</pre>
+        </details>
+
+        <details>
+            <summary><strong>Oracle Schemas Boyutları SQL</strong></summary>
+            <pre>
+SELECT owner sahip,
+       SUM(bytes/1048576) Boyut,
+       'MB' MB
+FROM   DBA_SEGMENTS
+GROUP BY owner
+ORDER BY Boyut DESC;
+            </pre>
+        </details>
+
+        <details>
+            <summary><strong>Oracle Silinen Tabloyu Geri Getirme</strong></summary>
+            <pre>
+-- Silinen tabloyu listeleme:
+SELECT * FROM dba_recyclebin
+WHERE TO_DATE(droptime, 'YYYY-MM-DD:HH24:MI:SS') BETWEEN SYSDATE - 10 AND SYSDATE;
+
+-- Geri getirme (sysdba ile):
+FLASHBACK TABLE hastane.konsultasyon TO BEFORE DROP;
+            </pre>
+        </details>
+
+        <details>
+            <summary><strong>Oracle Database Sıfırlama SQL (Toplu TRUNCATE Üretimi)</strong></summary>
+            <pre>
+SELECT
+  'TRUNCATE TABLE ' || A.TABLE_NAME || '; COMMIT;' AS SQL
+FROM all_tab_columns a
+WHERE a.owner = 'HASTANE'
+  AND (
+       A.COLUMN_NAME = 'DOSYA_NO' OR 
+       A.COLUMN_NAME = 'PROTOKOL_NO' OR 
+       A.COLUMN_NAME = 'DOSYA' OR 
+       A.COLUMN_NAME = 'PROTOKOL' OR 
+       A.COLUMN_NAME = 'ISTEK_NO'
+      )
+GROUP BY A.TABLE_NAME;
+            </pre>
+        </details>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Ahmet Karakurt</p>
+    </footer>
+</body>
+</html>
