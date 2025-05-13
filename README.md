@@ -1,0 +1,1 @@
+# ahmetkarakurt.github.io
