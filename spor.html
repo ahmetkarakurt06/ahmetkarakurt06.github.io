@@ -1,132 +1,113 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Şifreli Spor Programım</title>
+  <title>Ahmet Karakurt - Spor Programım</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      margin: 0;
-      padding: 20px;
-    }
-
+    body { font-family: Arial; background: #f4f4f4; margin: 0; padding: 20px; }
+    h1 { text-align: center; color: #2c3e50; }
     #loginBox, #programBox {
-      max-width: 500px;
-      margin: 50px auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      max-width: 500px; margin: 30px auto; background: #fff;
+      padding: 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-
-    h1 {
-      text-align: center;
-      color: #2c3e50;
+    input, textarea, button {
+      width: 100%; margin-top: 10px; padding: 10px;
+      border: 1px solid #ccc; border-radius: 6px;
     }
-
-    input[type="password"], input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 16px;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      background: #27ae60;
-      color: white;
-      border: none;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .program {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      margin-top: 30px;
-    }
-
-    .day {
-      background: #fdfdfd;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    textarea {
-      width: 100%;
-      height: 80px;
-      padding: 8px;
-      font-size: 14px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      resize: none;
-    }
+    button { background: #27ae60; color: white; font-weight: bold; cursor: pointer; }
+    button:hover { background: #219150; }
   </style>
 </head>
 <body>
 
-  <div id="loginBox">
-    <h1>Giriş Yap</h1>
-    <input type="password" id="password" placeholder="Şifreyi girin" />
-    <button onclick="login()">Giriş</button>
-    <p style="color:gray; font-size:14px; text-align:center;">İpucu: Şifre için ahmetkarakurt başvur.</p>
-  </div>
+<h1>Spor Programım</h1>
 
-  <div id="programBox" style="display:none;">
-    <h1>Haftalık Spor Programım</h1>
-    <div class="program" id="program"></div>
-  </div>
+<div id="loginBox">
+  <input type="email" id="email" placeholder="E-posta">
+  <input type="password" id="password" placeholder="Şifre">
+  <button onclick="login()">Giriş Yap</button>
+  <button onclick="register()">Kayıt Ol</button>
+</div>
 
-  <script>
-    const SIFRE = "ahmet123"; // ŞİFRENİ BURADA DEĞİŞTİR
+<div id="programBox" style="display:none;">
+  <p>Hoş geldin: <span id="username"></span></p>
+  <textarea id="programText" rows="6" placeholder="Haftalık programını buraya yaz..."></textarea>
+  <button onclick="saveProgram()">Kaydet</button>
+  <button onclick="logout()">Çıkış Yap</button>
+</div>
 
-    function login() {
-      const input = document.getElementById("password").value;
-      if (input === SIFRE) {
-        document.getElementById("loginBox").style.display = "none";
-        document.getElementById("programBox").style.display = "block";
-        gosterProgram();
-      } else {
-        alert("Şifre yanlış!");
-      }
-    }
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBnpT11NScYvhYeMbJpZuxxPSnH4IigIsc",
+    authDomain: "spor-programi.firebaseapp.com",
+    projectId: "spor-programi",
+    storageBucket: "spor-programi.appspot.com",
+    messagingSenderId: "697402473307",
+    appId: "1:697402473307:web:16130282f8020b2d94f87e",
+    measurementId: "G-8JFX9DHTN0"
+  };
 
-    function gosterProgram() {
-      const gunler = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
-      const programDiv = document.getElementById("program");
-      gunler.forEach(gun => {
-        const key = "spor_" + gun;
-        const saved = localStorage.getItem(key) || "";
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
-        const dayBox = document.createElement("div");
-        dayBox.className = "day";
+  function login() {
+    const email = emailEl.value;
+    const password = passwordEl.value;
+    auth.signInWithEmailAndPassword(email, password)
+      .then(() => showProgram(email))
+      .catch(e => alert("Hata: " + e.message));
+  }
 
-        const title = document.createElement("h2");
-        title.innerText = gun;
+  function register() {
+    const email = emailEl.value;
+    const password = passwordEl.value;
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(() => alert("Kayıt başarılı! Giriş yapabilirsin."))
+      .catch(e => alert("Hata: " + e.message));
+  }
 
-        const textarea = document.createElement("textarea");
-        textarea.value = saved;
+  function logout() {
+    auth.signOut();
+    loginBox.style.display = "block";
+    programBox.style.display = "none";
+    emailEl.value = "";
+    passwordEl.value = "";
+  }
 
-        const button = document.createElement("button");
-        button.innerText = "Kaydet";
-        button.onclick = () => {
-          localStorage.setItem(key, textarea.value);
-          alert(`${gun} için kayıt edildi.`);
-        };
+  function saveProgram() {
+    const user = auth.currentUser;
+    if (!user) return;
+    db.collection("programlar").doc(user.email).set({
+      program: programText.value
+    }).then(() => alert("Program kaydedildi."));
+  }
 
-        dayBox.appendChild(title);
-        dayBox.appendChild(textarea);
-        dayBox.appendChild(button);
-        programDiv.appendChild(dayBox);
+  function showProgram(email) {
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("programBox").style.display = "block";
+    document.getElementById("username").innerText = email;
+    db.collection("programlar").doc(email).get()
+      .then(doc => {
+        if (doc.exists) {
+          document.getElementById("programText").value = doc.data().program;
+        }
       });
-    }
-  </script>
+  }
+
+  const emailEl = document.getElementById("email");
+  const passwordEl = document.getElementById("password");
+  const loginBox = document.getElementById("loginBox");
+  const programBox = document.getElementById("programBox");
+
+  auth.onAuthStateChanged(user => {
+    if (user) showProgram(user.email);
+  });
+</script>
 
 </body>
 </html>
