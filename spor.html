@@ -1,20 +1,47 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Haftalık Spor Programım</title>
+  <title>Şifreli Spor Programım</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      padding: 20px;
+      background: #f4f4f4;
       margin: 0;
+      padding: 20px;
+    }
+
+    #loginBox, #programBox {
+      max-width: 500px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
     h1 {
       text-align: center;
       color: #2c3e50;
+    }
+
+    input[type="password"], input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #27ae60;
+      color: white;
+      border: none;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
     }
 
     .program {
@@ -25,79 +52,81 @@
     }
 
     .day {
-      background: #fff;
-      border-radius: 10px;
+      background: #fdfdfd;
       padding: 15px;
+      border-radius: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .day h2 {
-      margin-top: 0;
-      color: #2980b9;
     }
 
     textarea {
       width: 100%;
       height: 80px;
+      padding: 8px;
+      font-size: 14px;
       border-radius: 6px;
       border: 1px solid #ccc;
-      padding: 8px;
       resize: none;
-      font-size: 14px;
-    }
-
-    button {
-      margin-top: 10px;
-      width: 100%;
-      padding: 8px;
-      background-color: #27ae60;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #219150;
     }
   </style>
 </head>
 <body>
-  <h1>Haftalık Spor Programım</h1>
-  <div class="program" id="program">
-    <!-- Günler buraya gelecek -->
+
+  <div id="loginBox">
+    <h1>Giriş Yap</h1>
+    <input type="password" id="password" placeholder="Şifreyi girin" />
+    <button onclick="login()">Giriş</button>
+    <p style="color:gray; font-size:14px; text-align:center;">İpucu: Şifreyi koda sen belirleyeceksin</p>
+  </div>
+
+  <div id="programBox" style="display:none;">
+    <h1>Haftalık Spor Programım</h1>
+    <div class="program" id="program"></div>
   </div>
 
   <script>
-    const gunler = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
-    const programDiv = document.getElementById("program");
+    const SIFRE = "ahmet123"; // ŞİFRENİ BURADA DEĞİŞTİR
 
-    gunler.forEach(gun => {
-      const key = "spor_" + gun;
-      const saved = localStorage.getItem(key) || "";
+    function login() {
+      const input = document.getElementById("password").value;
+      if (input === SIFRE) {
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("programBox").style.display = "block";
+        gosterProgram();
+      } else {
+        alert("Şifre yanlış!");
+      }
+    }
 
-      const dayBox = document.createElement("div");
-      dayBox.className = "day";
+    function gosterProgram() {
+      const gunler = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
+      const programDiv = document.getElementById("program");
+      gunler.forEach(gun => {
+        const key = "spor_" + gun;
+        const saved = localStorage.getItem(key) || "";
 
-      const title = document.createElement("h2");
-      title.innerText = gun;
+        const dayBox = document.createElement("div");
+        dayBox.className = "day";
 
-      const textarea = document.createElement("textarea");
-      textarea.value = saved;
+        const title = document.createElement("h2");
+        title.innerText = gun;
 
-      const button = document.createElement("button");
-      button.innerText = "Kaydet";
-      button.onclick = () => {
-        localStorage.setItem(key, textarea.value);
-        alert(`${gun} için kayıt edildi!`);
-      };
+        const textarea = document.createElement("textarea");
+        textarea.value = saved;
 
-      dayBox.appendChild(title);
-      dayBox.appendChild(textarea);
-      dayBox.appendChild(button);
-      programDiv.appendChild(dayBox);
-    });
+        const button = document.createElement("button");
+        button.innerText = "Kaydet";
+        button.onclick = () => {
+          localStorage.setItem(key, textarea.value);
+          alert(`${gun} için kayıt edildi.`);
+        };
+
+        dayBox.appendChild(title);
+        dayBox.appendChild(textarea);
+        dayBox.appendChild(button);
+        programDiv.appendChild(dayBox);
+      });
+    }
   </script>
+
 </body>
 </html>
