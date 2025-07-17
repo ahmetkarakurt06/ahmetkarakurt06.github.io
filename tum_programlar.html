@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tüm Spor Programları</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f4f4f4; }
+    h1 { text-align: center; color: #2c3e50; }
+    table {
+      width: 100%; border-collapse: collapse; margin-top: 20px;
+      background: white; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ccc; padding: 10px; text-align: left;
+    }
+    th {
+      background: #2980b9; color: white;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Tüm Spor Programları</h1>
+<table id="programTable">
+  <thead>
+    <tr><th>E-posta</th><th>Spor Programı</th></tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBnpT11NScYvhYeMbJpZuxxPSnH4IigIsc",
+    authDomain: "spor-programi.firebaseapp.com",
+    projectId: "spor-programi",
+    storageBucket: "spor-programi.appspot.com",
+    messagingSenderId: "697402473307",
+    appId: "1:697402473307:web:16130282f8020b2d94f87e",
+    measurementId: "G-8JFX9DHTN0"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const tbody = document.querySelector("#programTable tbody");
+
+  db.collection("programlar").get().then(snapshot => {
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const tr = document.createElement("tr");
+
+      const emailTd = document.createElement("td");
+      emailTd.textContent = doc.id; // Document ID = kullanıcı e-postası
+      tr.appendChild(emailTd);
+
+      const programTd = document.createElement("td");
+      programTd.textContent = data.program || "";
+      tr.appendChild(programTd);
+
+      tbody.appendChild(tr);
+    });
+  }).catch(err => {
+    console.error("Hata: ", err);
+  });
+</script>
+
+</body>
+</html>
